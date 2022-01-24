@@ -4,6 +4,7 @@
 var startButton = document.querySelector("#start-btn");
 var timerEl = document.querySelector("#timer-countdown");
 var questionOrder = document.querySelector("#quiz-container");
+var myScore = 0;
 var myQuestion = [
     {
         question: "Who wrote the Harry Potter book series?",
@@ -61,12 +62,11 @@ var myQuestion = [
 
 var startQuiz = function() {
     startButton.style.display = 'none'; 
-    countDown();
+    countDown(60);
     nextQuestion();
 }
 
-function countDown() {
-    var timeLeft = 60;
+function countDown(timeLeft) {
 
     var timeInterval = setInterval(function() {
         if (timeLeft > 0) {
@@ -76,7 +76,7 @@ function countDown() {
     else {
         timerEl.textContent = "";
         clearInterval(timeInterval);
-        displayMessage();
+        displayMessage("The quiz is over. Let's see how you did!");
         }
     }, 1000);
 };
@@ -99,13 +99,25 @@ function nextQuestion() {
             nextButton.addEventListener('click', nextQuestion);
             questionOrder.appendChild(nextButton);
         }
+        
+        // if (myQuestion < 0) {
+        //     var stopButton = document.createElement("input");
+        //     stopButton.type = "button";
+        //     stopButton.value = "Results";
+        //     stopButton.addEventListener('click', showResults);
+        //     }
+        //     showResults();
 };
 
-// var showResults = function() {
+startButton.addEventListener("click", startQuiz);
 
+// var showResults = function() {
+//     myScore = myQuestion.correctAnswer;
+//     myScore++;
+//     // localStorage.setItem("")
 // };
 
-// buildQuiz();
+// // buildQuiz();
 
-startButton.addEventListener("click", startQuiz);
-// submitButton.addEventListener("click", showResults);
+
+// // submitButton.addEventListener("click", showResults);
