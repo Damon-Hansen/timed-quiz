@@ -1,10 +1,9 @@
-// var quizContainer = document.querySelector("#quiz");
-// var resultsContainer = document.querySelector("#results");
-// var submitButton = document.querySelector("#submit");
 var startButton = document.querySelector("#start-btn");
 var timerEl = document.querySelector("#timer-countdown");
 var questionOrder = document.querySelector("#quiz-container");
 var myScore = 0;
+var timeLeft = 60;
+var highScoreStorage = JSON.parse(localStorage.getItem("quiz")) || [];
 var myQuestion = [
     {
         question: "Who wrote the Harry Potter book series?",
@@ -62,13 +61,13 @@ var myQuestion = [
 
 var startQuiz = function() {
     startButton.style.display = 'none'; 
-    countDown(60);
+    countDown();
     nextQuestion();
 }
+    var timeInterval
+function countDown() {
 
-function countDown(timeLeft) {
-
-    var timeInterval = setInterval(function() {
+        timeInterval = setInterval(function() {
         if (timeLeft > 0) {
             timerEl.textContent = timeLeft;
             timeLeft--
@@ -76,48 +75,85 @@ function countDown(timeLeft) {
     else {
         timerEl.textContent = "";
         clearInterval(timeInterval);
-        displayMessage("The quiz is over. Let's see how you did!");
+        questionOrder.innerHTML = '';
+        questionOrder.innerHTML = "<p> Your score " + timeLeft + "</p>"
+        timerEl.style.display = 'none';
+        alert("The quiz is over. Let's see how you did!");
+        var newInput = document.createElement("input");
+        var newLabel = document.createElement("label");
+            newLabel.textContent = "Enter Initials";
+            questionOrder.appendChild(newInput, newLabel);
+            var inputButton = document.createElement("button");
+                inputButton.textContent = "Save";
+                inputButton.addEventListener("click", highScoreSave);
+                questionOrder.appendChild(inputButton);
+            timerEl.style.display = 'none';
         }
     }, 1000);
 };
 
+
 var questionIndex = -1;
-function nextQuestion() {
+function nextQuestion(event) {
+    if (event) {
+    var selectedAnswer = document.querySelector('input[name="radAnswer"]:checked').nextSibling.textContent;
+    if (selectedAnswer === myQuestion[questionIndex].correctAnswer) {
+        console.log("correct");
+    }
+    else {
+        timeLeft = timeLeft - 15;
+    }
+    }
     questionOrder.innerHTML = '';
     ++questionIndex;
-    console.log(questionOrder);
-        questionOrder.innerHTML += myQuestion[questionIndex].question + "<br />";
+        
+
+        if (questionIndex < (myQuestion.length)) {
+            questionOrder.innerHTML += myQuestion[questionIndex].question + "<br />";
 
         for (var i = 0; i < myQuestion[questionIndex].answers.length; i++) {
-            questionOrder.innerHTML += "<input type=radio id=myRadio name=radAnswer>" + myQuestion[questionIndex].answers[i] + "<br />";
+            questionOrder.innerHTML += "<input type=radio id= "+i+" name=radAnswer>" + "<label for=" + i + ">" + myQuestion[questionIndex].answers[i] + "</label>" + "<br />";
         }
-
-        if (questionIndex < (myQuestion.length - 1)) {
             var nextButton = document.createElement("input");
             nextButton.type = "button";
             nextButton.value = "Next";
             nextButton.addEventListener('click', nextQuestion);
             questionOrder.appendChild(nextButton);
+
         }
-        
-        // if (myQuestion < 0) {
-        //     var stopButton = document.createElement("input");
-        //     stopButton.type = "button";
-        //     stopButton.value = "Results";
-        //     stopButton.addEventListener('click', showResults);
-        //     }
-        //     showResults();
+
+        else {
+            clearInterval(timeInterval);
+            questionOrder.innerHTML = '';
+            questionOrder.innerHTML = "<p> Your score " + timeLeft + "</p>"
+        var newInput = document.createElement("input");
+        var newLabel = document.createElement("label");
+            newLabel.textContent = "Enter Initials";
+            questionOrder.appendChild(newInput, newLabel);
+            var inputButton = document.createElement("button");
+                inputButton.textContent = "Save";
+                inputButton.addEventListener("click", highScoreSave);
+                questionOrder.appendChild(inputButton);
+            timerEl.style.display = 'none';
+        }
 };
 
+    function highScoreSave(event) {
+        var textInitials = event.target.previousSibling.value;
+        var tempObject = {
+            initials: textInitials, score: timeLeft
+
+        }
+        highScoreStorage.push(tempObject);
+        localStorage.setItem("quiz", JSON.stringify(highScoreStorage));
+        questionOrder.innerHTML = '';
+        var newUl = document.createElement("ul");
+    for (var i = 0; i < highScoreStorage.length; i++) {
+        var newLi = document.createElement("li");
+        newLi.textContent = highScoreStorage[i].initials + " " + highScoreStorage[i].score;
+        newUl.appendChild(newLi);
+    }
+        questionOrder.appendChild(newUl);
+    }
+
 startButton.addEventListener("click", startQuiz);
-
-// var showResults = function() {
-//     myScore = myQuestion.correctAnswer;
-//     myScore++;
-//     // localStorage.setItem("")
-// };
-
-// // buildQuiz();
-
-
-// // submitButton.addEventListener("click", showResults);
